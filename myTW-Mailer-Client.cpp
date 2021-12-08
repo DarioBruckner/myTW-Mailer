@@ -53,7 +53,7 @@ int main(int argc, char **argv)
       print_usage(programm_name);
    }
    
-   printf("IP: %s\n", ip);
+   std::cout << "IP: " << ip << "\n";
    printf("Port: %d\n", port);
 
 
