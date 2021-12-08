@@ -174,7 +174,7 @@ int main(int argc, char **argv)
    // check for the commands till quit command is inserted
    // readirects to the selected command method
    do{
-      printf("Use one of the following commands: \nSEND \nLIST \nREAD \nDEL \nQUIT\n\n");
+      std::cout << "Use one of the following commands: \nSEND \nLIST \nREAD \nDEL \nQUIT\n\n";
       std::getline( std::cin, line );
       if(line == "SEND"){
          read_send_message();
