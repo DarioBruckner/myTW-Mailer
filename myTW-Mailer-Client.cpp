@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +41,8 @@ int main(int argc, char **argv)
       ip = argv[1];
       try
       {
-         port = std::stoi(argv[1]);
+         std::stringstream intPort(argv[2]);
+         intPort >> port;
       }
       catch(const std::exception& e)
       {
