@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ void print_usage(char *programm_name){
 
 int main(int argc, char **argv)
 {
-   pid_t pid;
+   //pid_t pid;
    socklen_t addrlen;
    struct sockaddr_in address, cliaddress;
    int reuseValue = 1;
@@ -215,9 +216,12 @@ int main(int argc, char **argv)
 
 void *clientCommunication(void *data)
 {
-   char buffer[BUF];
-   int size;
+   char buffer[BUF], temp[BUF];
+   int size, counter;
    int *current_socket = (int *)data;
+   //FILE * file;
+   std::vector<std::string> command;
+   std::string word;
 
    ////////////////////////////////////////////////////////////////////////////
    // SEND welcome message
@@ -232,6 +236,7 @@ void *clientCommunication(void *data)
    {
       /////////////////////////////////////////////////////////////////////////
       // RECEIVE
+      memset(buffer, 0 ,BUF);
       size = recv(*current_socket, buffer, BUF - 1, 0);
       if (size == -1)
       {
@@ -261,15 +266,67 @@ void *clientCommunication(void *data)
       {
          --size;
       }
-
+      
       buffer[size] = '\0';
-      printf("Message received: %s\n", buffer); // ignore error
+      counter = 0;
+      for(int i = 0; i < sizeof(buffer); i++){
+          if(buffer[i] == '\n'){
+             word = temp;
+             memset(temp, 0, BUF);
+             command.push_back(word);
+             counter = 0;
+          }else{
+             temp[counter] = buffer[i];
+          }
+          counter++;
 
+      }
+
+     if(command.size() == 0){
+         command.push_back(buffer);
+     }
+      
+     int vecsize = command.size();
+     if(command[0] == "SEND"){
+            std::cout << "Command" << command[0] << "received Data:";
+            
+            for(int i = 1; i < vecsize; i++){
+                std::cout << command[i];
+            }
+            printf("\n");
+      }else if(command[0] == "LIST"){
+            std::cout << "Command" << command[0] << "received Data:";
+            for(int i = 1; i < vecsize; i++){
+                std::cout << command[i];
+            }
+            printf("\n");
+      }else if(command[0] == "READ"){
+            std::cout << "Command" << command[0] << "received Data:";
+            for(int i = 1; i < vecsize; i++){
+                std::cout << command[i];
+            }
+            printf("\n");
+      }else if(command[0] == "DEL"){    
+            std::cout << "Command" << command[0] << "received Data:";
+            for(int i = 1; i < vecsize; i++){
+                std::cout << command[i];
+            }
+            printf("\n");
+      }else{
+           printf("Message received: %s\n", buffer); // ignore error
+      }
+
+
+
+      
       if (send(*current_socket, "OK", 3, 0) == -1)
       {
          perror("send answer failed");
          return NULL;
       }
+      
+       command.clear();
+      
    } while (strcmp(buffer, "quit") != 0 && !abortRequested);
 
    // closes/frees the descriptor if not already
