@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <arpa/inet.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -20,6 +21,7 @@
 
 void print_usage(char *programm_name){
    printf("Usage: %s ip port\n\n", programm_name);
+   EXIT_FAILURE;
 }
 
 
@@ -37,21 +39,22 @@ int main(int argc, char **argv)
 
    if(argc == 3){
       ip = argv[1];
-      try
-      {
-         std::stringstream intPort(argv[2]);
+      std::stringstream intPort(argv[2]);
          intPort >> port;
-      }
-      catch(const std::exception& e)
-      {
-         printf("Invalid Port Format\n");
-         print_usage(programm_name);
-      }
-      
-      
    }else{
       print_usage(programm_name);
    }
+   if(port == 0){
+      printf("Invalid Port!\n");
+      print_usage(programm_name);
+   }
+  
+   struct sockaddr_in sa;
+   if(inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr)) != 1){
+      printf("Invalid IP-Adress!\n");
+      print_usage(programm_name);
+   }
+   
    
    std::cout << "IP: " << ip << "\n";
    printf("Port: %d\n", port);
