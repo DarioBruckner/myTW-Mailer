@@ -18,9 +18,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
+// Prints the usage of the program
 void print_usage(char *programm_name){
-   printf("Usage: %s ip port\n\n", programm_name);
+   printf("Usage: %s <ip> <port>\n\n", programm_name);
    EXIT_FAILURE;
 }
 
@@ -37,6 +37,7 @@ int main(int argc, char **argv)
    std::string ip;
    unsigned short port;
 
+   // Gets IP and Port if the correct number of arguments is given
    if(argc == 3){
       ip = argv[1];
       std::stringstream intPort(argv[2]);
@@ -44,23 +45,26 @@ int main(int argc, char **argv)
    }else{
       print_usage(programm_name);
    }
+
+   // Checks if the port is valid
    if(port <= 0 || port > 65535){
       printf("Invalid Port!\n");
       print_usage(programm_name);
    }
   
+   // Checks if the ip address is valid
    struct sockaddr_in sa;
    if(inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr)) != 1){
       printf("Invalid IP-Adress!\n");
       print_usage(programm_name);
    }
    
-   
+   // Prints the selectet IP and Port
    std::cout << "IP: " << ip << "\n";
    printf("Port: %d\n", port);
 
 
-   /**
+   
 
    ////////////////////////////////////////////////////////////////////////////
    // CREATE A SOCKET
@@ -217,5 +221,5 @@ int main(int argc, char **argv)
    }
 
    return EXIT_SUCCESS;
-   **/
+  
 }
