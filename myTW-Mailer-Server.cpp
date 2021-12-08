@@ -23,11 +23,14 @@ int new_socket = -1;
 
 void *clientCommunication(void *data);
 void signalHandler(int sig);
+void child(void *data);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int main(void)
 {
+   pid_t pid;
    socklen_t addrlen;
    struct sockaddr_in address, cliaddress;
    int reuseValue = 1;
@@ -136,7 +139,20 @@ int main(void)
       printf("Client connected from %s:%d...\n",
              inet_ntoa(cliaddress.sin_addr),
              ntohs(cliaddress.sin_port));
-      clientCommunication(&new_socket); // returnValue can be ignored
+      clientCommunication(&new_socket);
+      //pid = fork();
+      //switch(pid){
+      //    case -1:
+      //       printf("Child could not be started");
+      //       exit(EXIT_FAILURE);
+      //       break;
+      //    case 0:
+      //       child(&new_socket);
+      //       exit(EXIT_SUCCESS);
+      //       break;
+      //    default:
+      //       break;
+      //}
       new_socket = -1;
    }
 
@@ -156,6 +172,12 @@ int main(void)
 
    return EXIT_SUCCESS;
 }
+
+
+//void child(void *data){
+//    int *new_socket = (int *) data;
+//    clientCommunication(new_socket); // returnValue can be ignored
+//}
 
 void *clientCommunication(void *data)
 {
