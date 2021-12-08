@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
+#include <string.h>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -28,12 +32,42 @@ void child(void *data);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int main(void)
+// Prints usage of programm
+void print_usage(char *programm_name){
+   printf("Usage: %s <ip> <mail-spool-directoryname>\n\n", programm_name);
+   EXIT_FAILURE;
+}
+
+
+int main(int argc, char **argv)
 {
    pid_t pid;
    socklen_t addrlen;
    struct sockaddr_in address, cliaddress;
    int reuseValue = 1;
+   char *programm_name;
+   programm_name = argv[0];
+   std::string directory;
+   unsigned short port;
+
+   // Gets IP and Port if the correct number of arguments is given
+   if(argc == 3){
+      std::stringstream intPort(argv[1]);
+         intPort >> port;
+      directory = argv[2];
+   }else{
+      print_usage(programm_name);
+   }
+
+   // Checks if the port is valid
+   if(port <= 0 || port > 65535){
+      printf("Invalid Port!\n");
+      print_usage(programm_name);
+   }
+   
+   // Prints the selectet Directory and Port
+   std::cout << "Directory: " << directory << "\n";
+   printf("Port: %d\n", port);
 
    ////////////////////////////////////////////////////////////////////////////
    // SIGNAL HANDLER
