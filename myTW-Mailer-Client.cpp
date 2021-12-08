@@ -44,7 +44,7 @@ int main(int argc, char **argv)
    }else{
       print_usage(programm_name);
    }
-   if(port > 0 && port <= 65535){
+   if(port <= 0 && port > 65535){
       printf("Invalid Port!\n");
       print_usage(programm_name);
    }
