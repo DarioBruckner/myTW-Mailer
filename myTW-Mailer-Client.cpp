@@ -14,6 +14,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+void print_usage(char *programm_name){
+   printf("Usage: %s ip port\n\n", programm_name);
+}
+
+
 int main(int argc, char **argv)
 {
    int create_socket;
@@ -21,6 +27,12 @@ int main(int argc, char **argv)
    struct sockaddr_in address;
    int size;
    int isQuit;
+   char *programm_name;
+   programm_name = argv[0];
+
+   printf("count: %d", argc);
+
+   /**
 
    ////////////////////////////////////////////////////////////////////////////
    // CREATE A SOCKET
@@ -177,4 +189,5 @@ int main(int argc, char **argv)
    }
 
    return EXIT_SUCCESS;
+   **/
 }
