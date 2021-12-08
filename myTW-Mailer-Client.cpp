@@ -35,7 +35,7 @@ int main(int argc, char **argv)
    char *programm_name;
    programm_name = argv[0];
    std::string ip;
-   short port;
+   unsigned short port;
 
    if(argc == 3){
       ip = argv[1];
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
    }else{
       print_usage(programm_name);
    }
-   if(port == 0){
+   if(port > 0 && port <= 65535){
       printf("Invalid Port!\n");
       print_usage(programm_name);
    }
