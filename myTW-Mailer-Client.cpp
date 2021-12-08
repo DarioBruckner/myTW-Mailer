@@ -35,8 +35,6 @@ int main(int argc, char **argv)
    std::string ip;
    short port;
 
-   printf("count: %d", argc);
-
    if(argc == 3){
       ip = argv[1];
       try
@@ -54,6 +52,10 @@ int main(int argc, char **argv)
    }else{
       print_usage(programm_name);
    }
+   
+   printf("IP: %s\n", ip);
+   printf("Port: %d\n", port);
+
 
    /**
 
