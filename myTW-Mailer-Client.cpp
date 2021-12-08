@@ -36,6 +36,7 @@ int main(int argc, char **argv)
    programm_name = argv[0];
    std::string ip;
    unsigned short port;
+   std::string line;
 
    // Gets IP and Port if the correct number of arguments is given
    if(argc == 3){
@@ -63,9 +64,15 @@ int main(int argc, char **argv)
    std::cout << "IP: " << ip << "\n";
    printf("Port: %d\n", port);
 
-
+   
+   do{
+      std::getline( std::cin, line );
+   }while(line != "QUIT");
    
 
+
+   
+/**
    ////////////////////////////////////////////////////////////////////////////
    // CREATE A SOCKET
    // https://man7.org/linux/man-pages/man2/socket.2.html
@@ -221,5 +228,5 @@ int main(int argc, char **argv)
    }
 
    return EXIT_SUCCESS;
-  
+  **/
 }
