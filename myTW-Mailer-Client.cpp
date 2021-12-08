@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -29,8 +30,27 @@ int main(int argc, char **argv)
    int isQuit;
    char *programm_name;
    programm_name = argv[0];
+   std::string ip;
+   short port;
 
    printf("count: %d", argc);
+
+   if(argc == 3){
+      ip = argv[1];
+      try
+      {
+         port = std::stoi(argv[1]);
+      }
+      catch(const std::exception& e)
+      {
+         printf("Invalid Port Format\n");
+         print_usage(programm_name);
+      }
+      
+      
+   }else{
+      print_usage(programm_name);
+   }
 
    /**
 
