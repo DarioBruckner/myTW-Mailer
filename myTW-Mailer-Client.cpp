@@ -18,10 +18,117 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+
 // Prints the usage of the program
 void print_usage(char *programm_name){
    printf("Usage: %s <ip> <port>\n\n", programm_name);
    EXIT_FAILURE;
+}
+
+// Reads a SEND message
+void read_send_message(){
+   std::string line;
+   std::stringstream ss;
+   ss << "SEND\n";
+
+   // Senders username
+   printf("Your username:\n");
+   ss << get_username() << "\n";
+
+   // Recievers username
+   printf("Recievers username:\n");
+   ss << get_username() << "\n";
+
+   // Subject
+   printf("Enter a subject\n");
+   do{
+      printf("Subject Guideline: 1 to 80 chars");
+      std::getline( std::cin, line );
+   }while(line.length() < 1 || line.length() > 80);
+   ss << line << "\n";
+   
+   // Message
+   printf("Enter the message (To finish entering put a dot -> '.' in a single line):\n");
+   do{
+      std::getline( std::cin, line );
+      ss << line << "\n";
+   }while(line != ".");
+
+   std::cout << "\n\n" << ss.str() << "\n";
+}
+
+// Asks the user for a username till a valid username is entered
+std::string get_username(){
+   std::string username;
+   bool valid;
+   do{
+      valid = true;
+      printf("Username Guidelines: 1 to 8 chars [a-z, 0-9]\n");
+      std::getline( std::cin, username );
+      // Checks if the length is valid
+      if(username.length() < 1 || username.length() > 8) valid = false;
+      else {
+         // Checks each character
+         for (std::string::size_type i = 0; i < username.size(); i++) {
+            // checks if the character is in range of 0-9 or a-z
+            if((username[i] < 48 || username[i] > 57) && (username[i] < 97 || username[i] > 122)) valid = false;
+         }
+      }
+   }while(!valid);
+   return username;
+}
+
+void read_list_message(){
+   std::stringstream ss;
+   ss << "LIST\n";
+
+   // Username
+   printf("Enter the username from which the messages should be listed:\n");
+   ss << get_username() << "\n";
+
+   std::cout << "\n\n" << ss.str() << "\n";
+}
+
+// Gets username and message number of delete_read_logic
+void read_read_message(){
+   std::stringstream ss;
+   ss << "READ\n";
+   ss << delete_read_logic();
+
+   std::cout << "\n\n" << ss.str() << "\n";
+}
+
+// Gets username and message number of delete_read_logic
+void read_del_message(){
+   std::stringstream ss;
+   ss << "DEL\n";
+   ss << delete_read_logic();
+
+   std::cout << "\n\n" << ss.str() << "\n";
+}
+
+// Logic for delete and read
+// Gets a valid username and valid message number
+std::string delete_read_logic(){
+   std::stringstream ss;
+   std::string line;
+   int msg_num;
+
+   // Username
+   printf("Enter the username:\n");
+   ss << get_username() << "\n";
+
+   // Message number
+   printf("Enter the message number of the message\n");
+   do{
+      printf("Message-Number Guideline: Integer greater than 0\n");
+      std::getline( std::cin, line );
+      std::stringstream intPort(line);
+         intPort >> msg_num;
+   }while(msg_num <= 0);
+   ss << line << "\n";
+   return ss.str();
 }
 
 
@@ -64,9 +171,30 @@ int main(int argc, char **argv)
    std::cout << "IP: " << ip << "\n";
    printf("Port: %d\n", port);
 
-   
+   // check for the commands till quit command is inserted
+   // readirects to the selected command method
    do{
+      printf("Use one of the following commands: \nSEND \nLIST \nREAD \nDEL \nQUIT\n\n");
       std::getline( std::cin, line );
+      if(line == "SEND"){
+         read_send_message();
+      }else if (line == "LIST")
+      {
+         read_list_message();
+      }else if (line == "READ")
+      {
+         read_read_message();
+      }else if (line == "DEL")
+      {
+         read_del_message();
+      }else if (line == "QUIT")
+      {
+         printf("Exit programm..\n");
+      }else{
+         printf("Command not recogniced!\n");
+      }
+      
+      
    }while(line != "QUIT");
    
 
