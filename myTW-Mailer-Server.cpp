@@ -1,17 +1,18 @@
+#include <filesystem>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
-#include <string.h>
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,6 +24,7 @@
 int abortRequested = 0;
 int create_socket = -1;
 int new_socket = -1;
+std::string directory = "";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +50,6 @@ int main(int argc, char **argv)
    int reuseValue = 1;
    char *programm_name;
    programm_name = argv[0];
-   std::string directory;
    unsigned short port;
 
    // Gets IP and Port if the correct number of arguments is given
@@ -123,7 +124,7 @@ int main(int argc, char **argv)
    memset(&address, 0, sizeof(address));
    address.sin_family = AF_INET;
    address.sin_addr.s_addr = INADDR_ANY;
-   address.sin_port = htons(PORT);
+   address.sin_port = htons(port);
 
    ////////////////////////////////////////////////////////////////////////////
    // ASSIGN AN ADDRESS WITH PORT TO SOCKET
@@ -208,16 +209,71 @@ int main(int argc, char **argv)
    return EXIT_SUCCESS;
 }
 
+std::string SplitString(std::string& str, const char c)
+{
+    const size_t index = str.find(c);
+    const std::string ret = str.substr(0, index);
+    str.erase(0, index + 1);
+    return ret;
+}
 
-//void child(void *data){
-//    int *new_socket = (int *) data;
-//    clientCommunication(new_socket); // returnValue can be ignored
-//}
+bool sendCommand(std::string message){
+    const std::string sender = SplitString(message, '\n');
+     
+    const std::string reciever = SplitString(message, '\n');
+     
+    const std::string topic = SplitString(message, '\n');
+    if(topic.length() > 80){
+        return false;
+    }
+    
+    const std::string content = SplitString(message, '.');
+
+    if(directory.back() != '/'){
+        directory.append("/"); 
+    }
+    std::string finaldirectory = directory + reciever;
+
+    if(!std::filesystem::exists(finaldirectory)){
+        if (!std::filesystem::create_directory(finaldirectory)){
+            std::cout << "Error creating directory" << std::endl;
+            return false;
+        }
+    }
+    std::string input = "";
+
+    std::ofstream newMessage(finaldirectory + "/" + "datastructure");
+    if (newMessage.is_open())
+        newMessage << content;
+    else
+    {
+        std::cout << "Error saving Message" << std::endl;
+        newMessage.close();
+        return false;
+    }
+    newMessage.close();
+
+    return true;
+}
+
+
+bool readCommand(std::string message){
+    return true;
+}
+
+bool listCommand(std::string message){
+    return true;
+}
+
+bool delCommand(std::string message){
+    return true;
+}
+
 
 void *clientCommunication(void *data)
 {
-   char buffer[BUF], temp[BUF];
-   int size, counter;
+   char buffer[BUF];
+   int size;
    int *current_socket = (int *)data;
    //FILE * file;
    std::vector<std::string> command;
@@ -267,51 +323,31 @@ void *clientCommunication(void *data)
          --size;
       }
       
-      buffer[size] = '\0';
-      counter = 0;
-      for(int i = 0; i < sizeof(buffer); i++){
-          if(buffer[i] == '\n'){
-             word = temp;
-             memset(temp, 0, BUF);
-             command.push_back(word);
-             counter = 0;
-          }else{
-             temp[counter] = buffer[i];
-          }
-          counter++;
-
-      }
-
-     if(command.size() == 0){
-         command.push_back(buffer);
-     }
       
-     int vecsize = command.size();
-     if(command[0] == "SEND"){
-            std::cout << "Command" << command[0] << "received Data:";
+      
+     buffer[size] = '\0';
+
+     std::string message = buffer;
+
+     std::string command = SplitString(message, '\n');
+
+
+
+     
+     if(command == "SEND"){
+            std::cout << "Command" << command << std::endl;
             
-            for(int i = 1; i < vecsize; i++){
-                std::cout << command[i];
-            }
-            printf("\n");
-      }else if(command[0] == "LIST"){
-            std::cout << "Command" << command[0] << "received Data:";
-            for(int i = 1; i < vecsize; i++){
-                std::cout << command[i];
-            }
-            printf("\n");
-      }else if(command[0] == "READ"){
-            std::cout << "Command" << command[0] << "received Data:";
-            for(int i = 1; i < vecsize; i++){
-                std::cout << command[i];
-            }
-            printf("\n");
-      }else if(command[0] == "DEL"){    
-            std::cout << "Command" << command[0] << "received Data:";
-            for(int i = 1; i < vecsize; i++){
-                std::cout << command[i];
-            }
-            printf("\n");
+            sendCommand(message);
+
+      }else if(command == "LIST"){
+            std::cout << "Command" << command << std::endl;;
+           
+      }else if(command == "READ"){
+            std::cout << "Command" << command << std::endl;;
+            
+      }else if(command == "DEL"){    
+            std::cout << "Command" << command << std::endl;;
+            
       }else{
            printf("Message received: %s\n", buffer); // ignore error
       }
