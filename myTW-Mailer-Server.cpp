@@ -13,6 +13,9 @@
 #include <string.h>
 #include <signal.h>
 #include <string>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/json.h>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -240,18 +243,26 @@ bool sendCommand(std::string message){
             return false;
         }
     }
-    std::string input = "";
+    
 
-    std::ofstream newMessage(finaldirectory + "/" + "datastructure");
-    if (newMessage.is_open())
-        newMessage << content;
-    else
-    {
-        std::cout << "Error saving Message" << std::endl;
-        newMessage.close();
-        return false;
-    }
-    newMessage.close();
+   if(!std::filesystem::exists(finaldirectory+"/datastructrue.json")){
+         std::ofstream newMessage(finaldirectory + "/" + "datastructure.json");
+    
+      if (newMessage.is_open())
+         newMessage << content;
+      else
+      {
+         std::cout << "Error saving Message" << std::endl;
+         newMessage.close();
+         return false;
+      }
+      newMessage.close();
+   }else{
+       std::ifstream datastructure("datastructure.json", std::ifstream::binary);
+       Json::Value data;
+       datastructure >> data;
+       std::cout << data["inbox"];
+   }
 
     return true;
 }
