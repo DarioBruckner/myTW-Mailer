@@ -13,9 +13,7 @@
 #include <string.h>
 #include <signal.h>
 #include <string>
-#include <jsoncpp/json/value.h>
-#include <jsoncpp/json/json.h>
-
+#include "jsoncpp/jsoncpp.cpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -221,6 +219,7 @@ std::string SplitString(std::string& str, const char c)
 }
 
 bool sendCommand(std::string message){
+   std::cout << "Hey";
     const std::string sender = SplitString(message, '\n');
      
     const std::string reciever = SplitString(message, '\n');
@@ -243,8 +242,11 @@ bool sendCommand(std::string message){
             return false;
         }
     }
-    
-
+    std::cout << finaldirectory << "/datastructure.json";
+  // std::ifstream datastructure(finaldirectory+"/datastructure.json", std::ifstream::binary);
+    //   Json::Value data;
+    //   datastructure >> data;
+       //std::cout << data["inbox"]["sender"];
    if(!std::filesystem::exists(finaldirectory+"/datastructrue.json")){
          std::ofstream newMessage(finaldirectory + "/" + "datastructure.json");
     
