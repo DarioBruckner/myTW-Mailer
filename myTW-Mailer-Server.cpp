@@ -210,6 +210,29 @@ int main(int argc, char **argv)
    return EXIT_SUCCESS;
 }
 
+void checkifDatastructExsists(std::string location){
+   FILE *file;
+   if((file = fopen(location.c_str(), "r"))){
+      fclose(file);
+   }else{
+      file = fopen(location.c_str(),"w");
+      fputs("{\"inbox\" : []}",file);
+      fclose(file);
+   }
+}
+
+bool writetoFile(std::string location, std::string content){
+   std::ofstream datastr(location);
+   if(datastr.is_open()){
+      datastr << content;
+      datastr.close();
+      return true;
+   }else{
+      datastr.close();
+      return false;
+   }
+}
+
 std::string SplitString(std::string& str, const char c)
 {
     const size_t index = str.find(c);
@@ -219,7 +242,6 @@ std::string SplitString(std::string& str, const char c)
 }
 
 bool sendCommand(std::string message){
-   std::cout << "Hey";
     const std::string sender = SplitString(message, '\n');
      
     const std::string reciever = SplitString(message, '\n');
@@ -235,6 +257,8 @@ bool sendCommand(std::string message){
         directory.append("/"); 
     }
     std::string finaldirectory = directory + reciever;
+   std::string location = finaldirectory+"/datastructure.json";
+
 
     if(!std::filesystem::exists(finaldirectory)){
         if (!std::filesystem::create_directory(finaldirectory)){
@@ -242,31 +266,30 @@ bool sendCommand(std::string message){
             return false;
         }
     }
-    std::cout << finaldirectory << "/datastructure.json";
-  // std::ifstream datastructure(finaldirectory+"/datastructure.json", std::ifstream::binary);
-    //   Json::Value data;
-    //   datastructure >> data;
-       //std::cout << data["inbox"]["sender"];
-   if(!std::filesystem::exists(finaldirectory+"/datastructrue.json")){
-         std::ofstream newMessage(finaldirectory + "/" + "datastructure.json");
-    
-      if (newMessage.is_open())
-         newMessage << content;
-      else
-      {
-         std::cout << "Error saving Message" << std::endl;
-         newMessage.close();
-         return false;
-      }
-      newMessage.close();
-   }else{
-       std::ifstream datastructure("datastructure.json", std::ifstream::binary);
-       Json::Value data;
-       datastructure >> data;
-       std::cout << data["inbox"];
-   }
+    checkifDatastructExsists(location);
 
-    return true;
+    std::ifstream datastructure(location, std::ifstream::binary);
+    Json::Value data;
+    datastructure >> data;
+    Json::Value newData;
+    Json::FastWriter write;
+
+   newData["sender"] = sender;
+   newData["reciever"] = reciever;
+   newData["subject"] = topic;
+   newData["message"] = content;
+
+   data["inbox"].append(newData);
+   std::string output = write.write(data);
+
+
+   if(writetoFile(location, output)){
+      std::cout << "It worked" << std::endl;
+   }else{
+      std::cout << "Error saving Message" << std::endl;
+      return false;
+   }
+   return true;
 }
 
 
@@ -349,7 +372,6 @@ void *clientCommunication(void *data)
      
      if(command == "SEND"){
             std::cout << "Command" << command << std::endl;
-            
             sendCommand(message);
 
       }else if(command == "LIST"){
