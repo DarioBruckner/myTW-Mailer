@@ -243,7 +243,7 @@ int main(int argc, char **argv)
    // check for the commands till quit command is inserted
    // readirects to the selected command method
    do{
-      std::cout << "Use one of the following commands: \nSEND \nLIST \nREAD \nDEL \nQUIT\n\n";
+      std::cout << "\n\nUse one of the following commands: (SEND, LIST, READ, DEL, QUIT)\n\n";
       std::getline( std::cin, line );
       if(line == "SEND"){
          result = read_send_message();
@@ -332,8 +332,12 @@ int main(int argc, char **argv)
                   else
                   {
                      buffer[size] = '\0';
-                     printf("<< %s\n", buffer); // ignore error
-                     if (strcmp("OK", buffer) != 0)
+                     //printf("<< %s\n", buffer); // ignore error
+                     
+                     std::string ret(buffer, strlen(buffer));
+                     std::cout << ret;
+                     printf("%s", ret);
+                     if (strcmp("OK", ret.substr(0,2).c_str()) != 0)
                      {
                         fprintf(stderr, "<< Server error occured, abort\n");
                         break;
