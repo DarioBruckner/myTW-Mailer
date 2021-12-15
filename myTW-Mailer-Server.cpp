@@ -242,21 +242,30 @@ std::string SplitString(std::string& str, const char c)
 }
 
 std::string sendCommand(std::string message){
-    const std::string sender = SplitString(message, '\n');
+   const std::string sender = SplitString(message, '\n');
      
-    const std::string reciever = SplitString(message, '\n');
+   const std::string reciever = SplitString(message, '\n');
      
-    const std::string topic = SplitString(message, '\n');
-    if(topic.length() > 80){
-        return "ERR\n";
-    }
-    
-    const std::string content = SplitString(message, '.');
+   const std::string topic = SplitString(message, '\n');
+   if(topic.length() > 80){
+      return "ERR\n";
+   }
+   std::string temp = "";
+   while(1){
+      temp += SplitString(message, '\n') + "\\";
+      if(message.size() == 1 && strcmp(".", message.c_str())){
+         break;
+      }
+   }
 
-    if(directory.back() != '/'){
-        directory.append("/"); 
-    }
-    std::string finaldirectory = directory + reciever;
+   const std::string content = temp + ".";
+
+   
+
+   if(directory.back() != '/'){
+      directory.append("/"); 
+   }
+   std::string finaldirectory = directory + reciever;
    std::string location = finaldirectory+"/datastructure.json";
 
 
@@ -268,11 +277,11 @@ std::string sendCommand(std::string message){
     }
     checkifDatastructExsists(location);
 
-    std::ifstream datastructure(location, std::ifstream::binary);
-    Json::Value data;
-    datastructure >> data;
-    Json::Value newData;
-    Json::FastWriter write;
+   std::ifstream datastructure(location, std::ifstream::binary);
+   Json::Value data;
+   datastructure >> data;
+   Json::Value newData;
+   Json::FastWriter write;
 
    newData["sender"] = sender;
    newData["reciever"] = reciever;
@@ -357,8 +366,48 @@ std::string listCommand(std::string message){
     return "ERR\n0\n";       
 }
 
-bool delCommand(std::string message){
-    return true;
+std::string delCommand(std::string message){
+
+   const std::string user = SplitString(message, '\n');
+     
+   const std::string index = SplitString(message, '\n');
+
+   std::string finaldirectory = directory + "/" + user;
+
+   if(!std::filesystem::exists(finaldirectory)){
+      return "ERR\n";
+   }
+
+   std::ifstream datastructure(finaldirectory +"/datastructure.json", std::ifstream::binary);
+
+   Json::Value data;
+   Json::FastWriter writer;
+
+
+
+   datastructure >> data;
+   int ind = stoi(index);
+   ind--;
+   int size = data["inbox"].size();
+   if(size == 0 || ind > size){
+      return "ERR\n";
+   }
+   Json::Value new_items;
+   new_items["inbox"] = Json::arrayValue;
+   for(int i = 0; i < size; i++)
+   {  
+      if(i != ind){
+        new_items["inbox"].append(data["inbox"][i]); 
+      }
+   }
+   data["inbox"] = new_items["inbox"];
+
+
+   std::string finaldata = writer.write(data);
+
+   writetoFile(finaldirectory+"/datastructure.json", finaldata);
+
+   return "OK\n";
 }
 
 
@@ -442,6 +491,8 @@ void *clientCommunication(void *data)
             
       }else if(command == "DEL"){    
             std::cout << "Command" << command << std::endl;;
+            std::string ret = delCommand(message);
+            send(*current_socket, ret.c_str(), 3, 0);
             
       }else{
            printf("Message received: %s\n", buffer); // ignore error
@@ -450,13 +501,6 @@ void *clientCommunication(void *data)
       strcpy(return_buffer, result.c_str());
       send(*current_socket, return_buffer, strlen(return_buffer), 0);
 
-      /**
-      if (send(*current_socket, "OK", 3, 0) == -1)
-      {
-         perror("ERR");
-         return NULL;
-      }
-      **/
        command.clear();
       
    } while (strcmp(buffer, "quit") != 0 && !abortRequested);
