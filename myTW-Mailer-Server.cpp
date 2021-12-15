@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 
    return EXIT_SUCCESS;
 }
-
+//checks if the Datastructe has been already used or not
 void checkifDatastructExsists(std::string location)
 {
    FILE *file;
@@ -227,7 +227,7 @@ void checkifDatastructExsists(std::string location)
       fclose(file);
    }
 }
-
+//writes String into the given file
 bool writetoFile(std::string location, std::string content)
 {
    std::ofstream datastr(location);
@@ -244,6 +244,7 @@ bool writetoFile(std::string location, std::string content)
    }
 }
 
+//splits the string at the given character
 std::string SplitString(std::string &str, const char c)
 {
    const size_t index = str.find(c);
@@ -252,19 +253,21 @@ std::string SplitString(std::string &str, const char c)
    return ret;
 }
 
+//Takes data provieded by the user and adds them to the datastructure
 std::string sendCommand(std::string message)
 {
-   const std::string sender = SplitString(message, '\n');
+   const std::string sender = SplitString(message, '\n');  //Sender
 
-   const std::string reciever = SplitString(message, '\n');
+   const std::string reciever = SplitString(message, '\n');//reciever
 
-   const std::string topic = SplitString(message, '\n');
+   const std::string topic = SplitString(message, '\n');   //subject
    if (topic.length() > 80)
    {
       return "ERR\n";
    }
 
    std::stringstream tmp;
+   //filterung \n for read function
    while (message.find("\n", 0) != std::string::npos)
    {
       tmp << message.substr(0, message.find("\n", 0)) << "\\";
@@ -277,31 +280,32 @@ std::string sendCommand(std::string message)
          message = "";
       }
    }
-   tmp << message;
-   const std::string content = tmp.str();
+   tmp << message << "\\";
+   const std::string content = tmp.str(); //message content
 
+   //depending if the user added a / to the directory or not adding a /
    if (directory.back() != '/')
    {
       directory.append("/");
    }
-   std::string finaldirectory = directory + reciever;
-   std::string location = finaldirectory + "/datastructure.json";
+   std::string finaldirectory = directory + reciever; //directory of the user specific datastructure
+   std::string location = finaldirectory + "/datastructure.json"; //path of the datastructure
 
-   if (!std::filesystem::exists(finaldirectory))
-   {
-      if (!std::filesystem::create_directory(finaldirectory))
-      {
+   //checks if its the first message and if the directory exists and if not creats it.
+   if (!std::filesystem::exists(finaldirectory)){
+      if (!std::filesystem::create_directory(finaldirectory)){
          std::cout << "Error creating directory" << std::endl;
          return "ERR\n";
       }
    }
+   
    checkifDatastructExsists(location);
 
-   std::ifstream datastructure(location, std::ifstream::binary);
-   Json::Value data;
+   std::ifstream datastructure(location, std::ifstream::binary); //filestream of the datastructure
+   Json::Value data; //the data of the datastructre
    datastructure >> data;
-   Json::Value newData;
-   Json::FastWriter write;
+   Json::Value newData; //the new data added to the existing data
+   Json::FastWriter write; //json to string converter for easy writing into the file
 
    newData["sender"] = sender;
    newData["reciever"] = reciever;
@@ -313,7 +317,7 @@ std::string sendCommand(std::string message)
 
    if (writetoFile(location, output))
    {
-      std::cout << "It worked" << std::endl;
+      std::cout << "Message successfully saved" << std::endl;
    }
    else
    {
@@ -413,8 +417,8 @@ std::string listCommand(std::string message)
 std::string delCommand(std::string message)
 {
 
-   const std::string user = SplitString(message, '\n');
-   const std::string index = SplitString(message, '\n');
+   const std::string user = SplitString(message, '\n');  //the target username
+   const std::string index = SplitString(message, '\n'); //the index of the message that it deleted
    std::string finaldirectory = directory + "/" + user;
 
    if (!std::filesystem::exists(finaldirectory))
