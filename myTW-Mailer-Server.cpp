@@ -53,15 +53,21 @@ int main(int argc, char **argv)
    unsigned short port;
 
    // Gets IP and Port if the correct number of arguments is given
-   if (argc == 3)
-   {
-      std::stringstream intPort(argv[1]);
-      intPort >> port;
-      directory = argv[2];
+   if (argc == 3){
+      if(std::filesystem::exists(argv[2])){
+         std::stringstream intPort(argv[1]);
+         intPort >> port;
+         directory = argv[2];
+      }else{
+         printf("Directory not found \n");
+         print_usage(programm_name);
+         return EXIT_FAILURE;
+      }
    }
    else
    {
       print_usage(programm_name);
+      return EXIT_FAILURE;
    }
 
    // Checks if the port is valid
@@ -69,8 +75,10 @@ int main(int argc, char **argv)
    {
       printf("Invalid Port!\n");
       print_usage(programm_name);
-   }
 
+      return EXIT_FAILURE;
+   }
+   
    // Prints the selectet Directory and Port
    std::cout << "Directory: " << directory << "\n";
    printf("Port: %d\n", port);
