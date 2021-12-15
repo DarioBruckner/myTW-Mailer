@@ -242,16 +242,23 @@ std::string SplitString(std::string& str, const char c)
 }
 
 std::string sendCommand(std::string message){
-    const std::string sender = SplitString(message, '\n');
+   const std::string sender = SplitString(message, '\n');
      
    const std::string reciever = SplitString(message, '\n');
      
-    const std::string topic = SplitString(message, '\n');
-    if(topic.length() > 80){
-        return "ERR\n";
-    }
+   const std::string topic = SplitString(message, '\n');
+   if(topic.length() > 80){
+      return "ERR\n";
+   }
+   std::string temp = "";
+   while(1){
+      temp += SplitString(message, '\n') + "\\";
+      if(message.size() == 1 && strcmp(".", message.c_str())){
+         break;
+      }
+   }
 
-   const std::string content = message;
+   const std::string content = temp + ".";
 
    
 
