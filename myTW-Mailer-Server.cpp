@@ -317,19 +317,18 @@ std::string readCommand(std::string message){
             ss << Json::writeString(builder, inbox[message_id]["subject"]).substr(1,Json::writeString(builder, inbox[message_id]["subject"]).length()-2) << "\n";
             std::string message_text = Json::writeString(builder, inbox[message_id]["message"]).substr(1,Json::writeString(builder, inbox[message_id]["message"]).length()-2);
 
-            std::cout << "Message Text" << message_text.find("n", 0);
-            std::cout.flush();
-            ss << message_text;
-
-            /**
-            while(message_text.find('\n')){
-               new_message << message_text.substr(0,) << "\n";
-               std::cout << message_text;
+            // Schleife um \\ mit \n zu ersetzen
+            std::stringstream tmp;
+            while(message_text.find("\\",0) != std::string::npos){
+               tmp << message_text.substr(0,message_text.find("\\",0)) << "\n";
+               if(message_text.find("\\",0) + 2 <= message_text.size()){
+                  message_text = message_text.substr(message_text.find("\\",0) + 2, message_text.size());
+               }else{
+                  message_text = "";
+               }
+            
             }
-            **/
-
-            std::cout << ss.str();
-            std::cout.flush();
+            ss << tmp.str() << message_text;
             return ss.str();
         }
     }
